@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <Arduino.h>
+#include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
@@ -21,8 +23,10 @@
 Adafruit_BME280 bme; // Create BME280 object
 Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
+
 HardwareTimer *LogTimer = new HardwareTimer(TIM2); // Timer for logging
 HardwareTimer *ButtonTimer = new HardwareTimer(TIM3); // Timer for button 
+
 
 volatile bool log_data_flag = false;
 uint32_t lastButtonPress=0;
@@ -63,11 +67,11 @@ void loop() {
   float pressureAtm=convertPatoAtm(pressure);
 
 
-  
+
 }
 
 
-void printValues(float tempC,float tempF,float humidity, float pressure) {
+void printValues(float tempC,float tempF,float humidity, float pressureAtm) {
   Serial.print(F("Temp(C) = "));
     Serial.print(tempC, 2);
 
@@ -87,9 +91,11 @@ float convertCtoF(float c) {
   return c * 9.0 / 5.0 + 32.0;
 }
 
+
 float convertPatoAtm(float pa) {
   return pa / 1013.25;
 }
+
 
 void updateNeopixels(int mode) {
   uint32_t color;
@@ -105,6 +111,8 @@ void updateNeopixels(int mode) {
   }
   pixels.show();
 }
+
+
 
 void updateSSD(float value, int mode) {
   // Placeholder function to update SSD display
