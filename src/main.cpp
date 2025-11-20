@@ -44,8 +44,13 @@ void LogTimerInterruptHandler(){
   log_data_flag = true;
 }
 
-void ButtonTimerInterrupt(){
+void ButtonTimerInterrupt(){ 
+  if(digitalRead(USER_BUTTON_PIN)==LOW){  //if button pressed
 
+    displayMode= (displayMode + 1) %4; //go through sensors
+
+    updateNeopixels(displayMode);
+  }
 }
 
 
