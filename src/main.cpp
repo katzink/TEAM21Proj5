@@ -4,6 +4,7 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
 #include <stdio.h>
+#include "SSD_Array.h"
 
 #define BME_ADDRESS 0x76 // I2C address of BME280 (change to 0x77 if needed)
 #define NEOPIXEL_PIN PA8 // Pin where NeoPixels are connected
@@ -44,6 +45,9 @@ void ButtonTimerInterrupt() {
 void setup() {
   Serial.begin(115200);
   while (!Serial);
+
+  SSD_init();
+  SSD_update(0,0,0);
 
   pixels.begin();
   pixels.clear();
