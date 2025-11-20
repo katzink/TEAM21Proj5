@@ -3,7 +3,7 @@
 // * Helper file for SSD_Array.c
 // * CPEG222, 9/19/25
 // ****************************************************************
-#include "SSD_Array.h"
+#include "SSD_Array.hpp"
 #include "stm32f4xx.h"
 
 #define SSDAA_PIN (10) // Assuming SSD segment AA is connected to GPIOB pin 10
@@ -96,10 +96,11 @@ void SSD_update(int digitSelect, int value, int decimalPoint) {
   int thirdDigit = (value / 10) % 10;
   int fourthDigit = value % 10;
 
-  DIGIT1_PORT->ODR |= (1 << DIGIT1_PIN); // Turn off common pin for first digit
-  DIGIT2_PORT->ODR |= (1 << DIGIT2_PIN); // Turn off common pin for second digit
-  DIGIT3_PORT->ODR |= (1 << DIGIT3_PIN); // Turn off common pin for third digit
-  DIGIT4_PORT->ODR |= (1 << DIGIT4_PIN); // Turn off common pin for fourth digit
+  // Turn OFF all digits for common-anode (set low)
+  DIGIT1_PORT->ODR &= ~(1 << DIGIT1_PIN);
+  DIGIT2_PORT->ODR &= ~(1 << DIGIT2_PIN);
+  DIGIT3_PORT->ODR &= ~(1 << DIGIT3_PIN);
+  DIGIT4_PORT->ODR &= ~(1 << DIGIT4_PIN);
   switch (digitSelect) {
   case 0: { // Update first digit
     unsigned char segments = digitSegments[firstDigit];
@@ -125,8 +126,8 @@ void SSD_update(int digitSelect, int value, int decimalPoint) {
     } else {
       SSDDP_PORT->ODR &= ~(1 << SSDDP_PIN); // Turn off decimal point
     }
-    DIGIT1_PORT->ODR &=
-        ~(1 << DIGIT1_PIN); // Turn on common pin for first digit
+    // Turn ON common pin for first digit (set high for common-anode)
+    DIGIT1_PORT->ODR |= (1 << DIGIT1_PIN);
     break;
   }
   case 1: { // Update second digit
@@ -153,8 +154,8 @@ void SSD_update(int digitSelect, int value, int decimalPoint) {
     } else {
       SSDDP_PORT->ODR &= ~(1 << SSDDP_PIN); // Turn off decimal point
     }
-    DIGIT2_PORT->ODR &=
-        ~(1 << DIGIT2_PIN); // Turn on common pin for second digit
+    // Turn ON common pin for second digit (set high for common-anode)
+    DIGIT2_PORT->ODR |= (1 << DIGIT2_PIN);
     break;
   }
   case 2: { // Update third digit
@@ -181,8 +182,8 @@ void SSD_update(int digitSelect, int value, int decimalPoint) {
     } else {
       SSDDP_PORT->ODR &= ~(1 << SSDDP_PIN); // Turn off decimal point
     }
-    DIGIT3_PORT->ODR &=
-        ~(1 << DIGIT3_PIN); // Turn on common pin for third digit
+    // Turn ON common pin for third digit (set high for common-anode)
+    DIGIT3_PORT->ODR |= (1 << DIGIT3_PIN);
     break;
   }
   case 3: { // Update fourth digit
@@ -206,8 +207,8 @@ void SSD_update(int digitSelect, int value, int decimalPoint) {
     } else {
       SSDDP_PORT->ODR &= ~(1 << SSDDP_PIN); // Turn off decimal point
     }
-    DIGIT4_PORT->ODR &=
-        ~(1 << DIGIT4_PIN); // Turn  on common pin for fourth digit
+    // Turn ON common pin for fourth digit (set high for common-anode)
+    DIGIT4_PORT->ODR &= ~(1 << DIGIT4_PIN);
     break;
   }
   default:

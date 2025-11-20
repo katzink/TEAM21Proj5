@@ -4,7 +4,7 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
 #include <stdio.h>
-#include "SSD_Array.h"
+#include "SSD_Array.hpp"
 
 #define BME_ADDRESS 0x76 // I2C address of BME280 (change to 0x77 if needed)
 #define NEOPIXEL_PIN PA8 // Pin where NeoPixels are connected
@@ -17,7 +17,10 @@
 #define BUTTON_DEBOUNCE_DELAY_MS 50   // Debounce delay for the button
 
 Adafruit_BME280 bme = Adafruit_BME280(); // Create BME280 object
-Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\
+HardwareTimer* timer = new HardwareTimer(TIM2);
+
+
 
 volatile int displayMode = 0; // 0: Temp, 1: Humidity, 2: Pressure, 3: Altitude
 volatile uint32_t lastButtonPressTime = 0;
@@ -42,12 +45,21 @@ void ButtonTimerInterrupt() {
     updateNeopixels(displayMode);
 }
 
+int digit = 0;
+int number = 0;
+void SSD_Display() {
+  SSD_update(digit, number, 0);
+  digit = (digit + 1) % 4;
+}
+
 void setup() {
   Serial.begin(115200);
   while (!Serial);
 
   SSD_init();
-  SSD_update(0,0,0);
+  timer->setOverflow(1000, HERTZ_FORMAT);
+  timer->attachInterrupt(SSD_Display);
+  timer->resume();
 
   pixels.begin();
   pixels.clear();
@@ -77,6 +89,7 @@ void loop() {
     pressureAtm = convertPatoAtm(pressure);
 
     printValues(tempC, tempF, humidity, pressureAtm);
+    number = (number + 1) % 10;
   }
 }
 
@@ -113,10 +126,4 @@ void updateNeopixels(int mode) {
     pixels.setPixelColor(i, color);
   }
   pixels.show();
-}
-
-void updateSSD(float value, int mode) {
-  // Placeholder function to update SSD display
-  // Implementation depends on specific SSD library used
-  // For example: display.println(value); display.display();
 }
