@@ -40,17 +40,12 @@ void updateSSD(float value, int mode);
 float convertCtoF(float c);
 float convertPatoAtm(float pa);
 
-void LogTimerInterruptHandler(){ 
+void LogTimerInterruptHandler(){
   log_data_flag = true;
 }
 
-void ButtonTimerInterrupt(){ 
-  if(digitalRead(USER_BUTTON_PIN)==LOW){  //if button pressed
+void ButtonTimerInterrupt(){
 
-    displayMode= (displayMode + 1) %4; //go through sensors
-
-    updateNeopixels(displayMode);
-  }
 }
 
 
@@ -118,6 +113,6 @@ void updateNeopixels(int mode) {
 
 
 void updateSSD(float value, int mode) {
-  SSD_Di
-  
+  // Placeholder function to update SSD display
+  // Implementation depends on specific SSD library used
 }
