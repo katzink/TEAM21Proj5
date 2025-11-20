@@ -33,34 +33,25 @@ void updateNeopixels(int mode);
 void updateSSD(float value, int mode);
 float convertCtoF(float c);
 float convertPatoAtm(float pa);
-void checkButton();
-
 void ButtonTimerInterrupt(){
-  
+    lastButtonPressTime = millis();
+    displayMode = (displayMode + 1) % 4; // Cycle through modes
+    updateNeopixels(displayMode);
 }
 
 void setup() {
   Serial.begin(115200);
   while (!Serial); // Wait for serial port to connect. Needed for native USB only
-
-    displayMode= (displayMode + 1) %4; //go through sensors
-    updateNeopixels(displayMode);
+  displayMode= (displayMode + 1) %4; //go through sensors
+  updateNeopixels(displayMode);
   pinMode(USER_BUTTON_PIN, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(USER_BUTTON_PIN), ButtonTimerInterrupt, FALLING);
 
   Wire.begin();
   if (!bme.begin(BME_ADDRESS)) {
     Serial.println(F("Could not find a valid BME280 sensor, check wiring!"));
     while (1);
   }
-}
-
-
-void setup() {
-  Serial.begin(115200);
-  attachInterrupt(digitalPinToInterrupt(USER_BUTTON_PIN), ButtonTimerInterrupt, FALLING);
-  pixels.begin();
-  pixels.setBrightness(50); // Set brightness to a reasonable value
-  updateNeopixels(displayMode); // Set initial color
 }
 
 
@@ -95,9 +86,7 @@ void loop() {
 
 void checkButton() {
   if (digitalRead(USER_BUTTON_PIN) == LOW && (millis() - lastButtonPressTime > BUTTON_DEBOUNCE_DELAY_MS)) {
-    lastButtonPressTime = millis();
-    displayMode = (displayMode + 1) % 4; // Cycle through modes
-    updateNeopixels(displayMode);
+    
   }
 }
 
