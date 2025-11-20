@@ -4,6 +4,7 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
 #include <SparkFun_BMI270_Arduino_Library.h>
+#include <stdio.h>
 
 #define BME_ADDRESS 0x76 // I2C address of BME280 (change to 0x77 if needed)
 #define NEOPIXEL_PIN PA8 // Pin where NeoPixels are connected
@@ -21,7 +22,6 @@ Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 volatile int displayMode=0; // 0: Temp, 1: Humidity, 2: Pressure, 3: Altitude
 uint32_t lastButtonPress=0;
 uint32_t lastTime=0;
-uint32_t lastButtonPress=0;
 uint32_t lastSensorReadTime=0;
 uint32_t lastButtonPressTime=0;
 
@@ -56,66 +56,32 @@ void setup() {
 
 
 void loop() { 
-  float tempC=bme.readTemperature();
-  float humidity=bme.readHumidity();
-  float pressure=bme.readPressure()/100.0F; // Convert to hPa
-  float tempf=convertCtoF(tempC);
+  float tempC = bme.readTemperature();
+  float tempF = convertCtoF(tempC);
+  float humidity = bme.readHumidity();
+  float pressure = bme.readPressure(); // Convert to hPa
+  float tempf = convertCtoF(tempC);
   float pressureAtm=convertPatoAtm(pressure);
-  checkButton();
 
-  if (millis() - lastSensorReadTime >= SENSOR_READ_INTERVAL_MS) {
-    lastSensorReadTime = millis();
-
-    float tempC = bme.readTemperature();
-    float humidity = bme.readHumidity();
-    float pressure = bme.readPressure() / 100.0F; // Convert Pa to hPa
-    float tempF = convertCtoF(tempC);
-    float pressureAtm = convertPatoAtm(pressure);
-
-    printValues(tempC, tempF, humidity, pressureAtm);
-
-    // You could update an SSD here based on the current mode
-    // switch(displayMode) {
-    //   case 0: updateSSD(tempC, displayMode); break;
-    //   case 1: updateSSD(humidity, displayMode); break;
-    //   case 2: updateSSD(pressure, displayMode); break;
-    //   case 3: updateSSD(bme.readAltitude(1013.25), displayMode); break; // Use a standard pressure for altitude
-    // }
-  }
+  delay(SENSOR_READ_INTERVAL_MS);
+  printValues(tempC, tempF, humidity, pressureAtm);
 }
 
-void checkButton() {
-  if (digitalRead(USER_BUTTON_PIN) == LOW && (millis() - lastButtonPressTime > BUTTON_DEBOUNCE_DELAY_MS)) {
-    
-  }
-}
 
 void printValues(float tempC,float tempF,float humidity, float pressureAtm) {
-  Serial.print(F("Temp(C) = "));
-    Serial.print(tempC, 2);
-
-    Serial.print(F(", Temp(F) = "));
-    Serial.print(tempF, 2);
-
-    Serial.print(F(", RelHum(%) = "));
-    Serial.print(humidity, 2);
-
-    Serial.print(F(", Press(atm) = "));
-    Serial.print(pressureAtm, 4); 
-
-    Serial.println();
+  char buffer[50];
+  sprintf(buffer, "Temp(C) = %.2f, Temp(F) = %.2f, RelHum(%%) = %.2f, Press(atm) = %.4f", tempC, tempF, humidity, pressureAtm);
+  Serial.println(buffer);
 }
 
 float convertCtoF(float c) {
   return c * 9.0 / 5.0 + 32.0;
 }
 
-
 float convertPatoAtm(float pa) {
   return pa / 1013.25;
   return pa / 1013.25F;
 }
-
 
 void updateNeopixels(int mode) {
   uint32_t color;
@@ -131,8 +97,6 @@ void updateNeopixels(int mode) {
   }
   pixels.show();
 }
-
-
 
 void updateSSD(float value, int mode) {
   // Placeholder function to update SSD display
