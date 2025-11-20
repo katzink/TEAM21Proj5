@@ -3,9 +3,10 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
+#include <SparkFun_BMI270_Arduino_Library.h>
 
 #define BME_ADDRESS 0x76 // I2C address of BME280 (change to 0x77 if needed)
-
+#define BMI_ADDRESS 0x68 // I2C address of BMI270 (change to 0x69 if needed)
 #define NEOPIXEL_PIN PA8 // Pin where NeoPixels are connected
 #define NEOPIXEL_COUNT 4 // Number of NeoPixels
 
@@ -15,7 +16,8 @@
 #define SENSOR_READ_INTERVAL_MS 5000 // Interval for sensor readings
 #define BUTTON_DEBOUNCE_DELAY_MS 50   // Debounce delay for the button
 
-Adafruit_BME280 bme; // Create BME280 object
+BMI270 bmi = BMI270();
+Adafruit_BME280 bme = Adafruit_BME280(); // Create BME280 object
 Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
 volatile int displayMode=0; // 0: Temp, 1: Humidity, 2: Pressure, 3: Altitude
@@ -51,6 +53,10 @@ void setup() {
   if (!bme.begin(BME_ADDRESS)) {
     Serial.println(F("Could not find a valid BME280 sensor, check wiring!"));
     while (1);
+  }
+  if(!bmi.beginI2C(BMI_ADDRESS)){
+    Serial.println(F("Could not find a valid BMI270 sensor, check wiring!"));
+    while(1);
   }
 }
 
