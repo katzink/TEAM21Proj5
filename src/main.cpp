@@ -33,10 +33,6 @@ void updateSSD(float value, int mode);
 float convertCtoF(float c);
 float convertPatoAtm(float pa);
 
-void LogTimerInterruptHandler(){
-  log_data_flag = true;
-}
-
 void ButtonTimerInterrupt(){
   if(digitalRead(USER_BUTTON_PIN)==LOW){  //if button pressed
 
