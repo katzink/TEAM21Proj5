@@ -118,6 +118,6 @@ void updateNeopixels(int mode) {
 
 
 void updateSSD(float value, int mode) {
-  // Placeholder function to update SSD display
-  // Implementation depends on specific SSD library used
+  SSD_Di
+  
 }
