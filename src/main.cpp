@@ -4,10 +4,10 @@
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
 #include <stdio.h>
-#include "SSD_Array.hpp"
+#include "SSD_Array.h"
 
-#define BME_ADDRESS 0x76 // I2C address of BME280 (change to 0x77 if needed)
-#define NEOPIXEL_PIN PA8 // Pin where NeoPixels are connected
+#define BME_ADDRESS 0x76   // I2C address of BME280 (change to 0x77 if needed)
+#define NEOPIXEL_PIN A0   // Pin where NeoPixels are connected (was 0, which conflicts with Serial RX)
 #define NEOPIXEL_COUNT 4 // Number of NeoPixels
 
 #define USER_BUTTON_PIN PC13 // Pin for user button
@@ -17,7 +17,7 @@
 #define BUTTON_DEBOUNCE_DELAY_MS 50   // Debounce delay for the button
 
 Adafruit_BME280 bme = Adafruit_BME280(); // Create BME280 object
-Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);\
+Adafruit_NeoPixel* pixels = new Adafruit_NeoPixel(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 HardwareTimer* timer = new HardwareTimer(TIM2);
 
 
@@ -46,9 +46,28 @@ void ButtonTimerInterrupt() {
 }
 
 int digit = 0;
-int number = 0;
-void SSD_Display() {
-  SSD_update(digit, number, 0);
+void SSD_Update(void){
+  int num = 0;
+  switch(displayMode) {
+    case 0:
+      num = (int)(tempC * 100);
+      SSD_update(digit, num, 2);
+      break;
+    case 1:
+      num = (int)(tempF * 100);
+      SSD_update(digit, num, 2);
+      break;
+    case 2:
+      num = (int)(humidity * 100);
+      SSD_update(digit, num, 2);
+      break;
+    case 3:
+      num = (int)(pressureAtm * 1000);
+      SSD_update(digit, num, 1);
+      break;
+    default:
+      break;
+  }
   digit = (digit + 1) % 4;
 }
 
@@ -58,12 +77,13 @@ void setup() {
 
   SSD_init();
   timer->setOverflow(1000, HERTZ_FORMAT);
-  timer->attachInterrupt(SSD_Display);
+  timer->attachInterrupt(SSD_Update);
   timer->resume();
 
-  pixels.begin();
-  pixels.clear();
-  pixels.show();
+  pixels->begin();
+  pixels->show();
+  pixels->setBrightness(50);
+
 
   pinMode(USER_BUTTON_PIN, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(USER_BUTTON_PIN), ButtonTimerInterrupt, FALLING);
@@ -89,7 +109,7 @@ void loop() {
     pressureAtm = convertPatoAtm(pressure);
 
     printValues(tempC, tempF, humidity, pressureAtm);
-    number = (number + 1) % 10;
+    updateNeopixels(displayMode);
   }
 }
 
@@ -116,14 +136,14 @@ float convertPatoAtm(float pa) {
 void updateNeopixels(int mode) {
   uint32_t color;
   switch(mode) {
-    case 0: color=pixels.Color(255,0,0); break; // Red for temperature
-    case 1: color=pixels.Color(0,0,255); break; // Blue for humidity
-    case 2: color=pixels.Color(0,255,0); break; // Green for pressure
-    case 3: color=pixels.Color(255,255,0); break; // Yellow for altitude
-    default: color=pixels.Color(255,255,255); break; // White as fallback
+    case 0: color = pixels->Color(255,0,0); break; // Red for temperature
+    case 1: color = pixels->Color(0,0,255); break; // Blue for humidity
+    case 2: color = pixels->Color(0,255,0); break; // Green for pressure
+    case 3: color = pixels->Color(255,255,0); break; // Yellow for altitude
+    default: color = pixels->Color(255,255,255); break; // White as fallback
   }
   for (int i = 0; i < NEOPIXEL_COUNT; i++) {
-    pixels.setPixelColor(i, color);
+    pixels->setPixelColor(i, color);
   }
-  pixels.show();
+  pixels->show();
 }
