@@ -40,7 +40,7 @@ void updateSSD(float value, int mode);
 float convertCtoF(float c);
 float convertPatoAtm(float pa);
 
-void LogTimerInterruptHandler(){
+void LogTimerInterruptHandler(){ 
   log_data_flag = true;
 }
 
