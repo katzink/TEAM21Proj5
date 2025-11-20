@@ -6,15 +6,10 @@
 
 #define BME_ADDRESS 0x76 // I2C address of BME280 (change to 0x77 if needed)
 
-// NeoPixel config
-#define NEOPIXEL_PIN PA8 // Change if your NeoPixels are on a different pin
-#define NEOPIXEL_COUNT 4
-
 #define NEOPIXEL_PIN PA8 // Pin where NeoPixels are connected
 #define NEOPIXEL_COUNT 4 // Number of NeoPixels
 
 #define USER_BUTTON_PIN PC13 // Pin for user button
-
 #define INTERVAL_MS ((uint32_t)5000) // Interval for sensor readings
 #define ATM_PA 1013.25 // Standard atmospheric pressure in hPa
 
