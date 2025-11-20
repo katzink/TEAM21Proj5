@@ -16,10 +16,6 @@
 Adafruit_BME280 bme; // Create BME280 object
 Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-
-HardwareTimer *LogTimer = new HardwareTimer(TIM2); // Timer for logging
-HardwareTimer *ButtonTimer = new HardwareTimer(TIM3); // Timer for button 
-
 volatile int displayMode=0; // 0: Temp, 1: Humidity, 2: Pressure, 3: Altitude
 uint32_t lastButtonPress=0;
 uint32_t lastTime=0;
@@ -33,18 +29,26 @@ void updateSSD(float value, int mode);
 float convertCtoF(float c);
 float convertPatoAtm(float pa);
 
+
+void setup() {
+  Serial.begin(115200);
+
+  if (!bme.begin(BME_ADDRESS)) {
+    while(1) delay(1000);
+  }
+
+  pixels.begin();
+  updateNeopixels(displayMode);
+  pinMode(USER_BUTTON_PIN, INPUT_PULLUP);
+}
+
+
 void ButtonTimerInterrupt(){
   if(digitalRead(USER_BUTTON_PIN)==LOW){  //if button pressed
 
     displayMode= (displayMode + 1) %4; //go through sensors
     updateNeopixels(displayMode);
   }
-}
-
-
-void setup() {
-  Serial.begin(115200);
-
 }
 
 
