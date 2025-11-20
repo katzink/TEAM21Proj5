@@ -18,10 +18,6 @@
 Adafruit_BME280 bme; // Create BME280 object
 Adafruit_NeoPixel pixels(NEOPIXEL_COUNT, NEOPIXEL_PIN, NEO_GRB + NEO_KHZ800);
 
-
-HardwareTimer *LogTimer = new HardwareTimer(TIM2); // Timer for logging
-HardwareTimer *ButtonTimer = new HardwareTimer(TIM3); // Timer for button 
-
 volatile int displayMode=0; // 0: Temp, 1: Humidity, 2: Pressure, 3: Altitude
 uint32_t lastButtonPress=0;
 uint32_t lastTime=0;
