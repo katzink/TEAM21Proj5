@@ -3,7 +3,6 @@
 #include <Adafruit_Sensor.h>
 #include <Adafruit_BME280.h>
 #include <Adafruit_NeoPixel.h>
-#include <stdio.h>
 #include "SSD_Array.h"
 
 #define BME_ADDRESS 0x76   // I2C address of BME280 (change to 0x77 if needed)
@@ -136,11 +135,11 @@ float convertPatoAtm(float pa) {
 void updateNeopixels(int mode) {
   uint32_t color;
   switch(mode) {
-    case 0: color = pixels->Color(255,0,0); break; // Red for temperature
-    case 1: color = pixels->Color(0,0,255); break; // Blue for humidity
-    case 2: color = pixels->Color(0,255,0); break; // Green for pressure
-    case 3: color = pixels->Color(255,255,0); break; // Yellow for altitude
-    default: color = pixels->Color(255,255,255); break; // White as fallback
+    case 0: color = pixels->Color(255/5,0,0); break; // Red for temperature
+    case 1: color = pixels->Color(0,0,255/5); break; // Blue for humidity
+    case 2: color = pixels->Color(0,255/5,0); break; // Green for pressure
+    case 3: color = pixels->Color(255/5,255/5,0); break; // Yellow for altitude
+    default: color = pixels->Color(255/5,255/5,255/5); break; // White as fallback
   }
   for (int i = 0; i < NEOPIXEL_COUNT; i++) {
     pixels->setPixelColor(i, color);
